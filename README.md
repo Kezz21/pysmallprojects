@@ -1,0 +1,2 @@
+# pysmallprojects
+Python small projects

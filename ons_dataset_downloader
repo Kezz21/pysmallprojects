@@ -4,7 +4,7 @@ import pandas as pd
 import csv
 import pathlib
 from pathlib import Path
-from bs4 import BeautifulSoup
+
 
 ########################################### MANUAL INPUTS #######################################################################
 

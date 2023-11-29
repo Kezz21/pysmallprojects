@@ -1,0 +1,46 @@
+import time
+import requests
+import pandas as pd
+import csv
+import pathlib
+from pathlib import Path
+from bs4 import BeautifulSoup
+
+########################################### MANUAL INPUTS #######################################################################
+
+# File path
+file_path = str(pathlib.Path("INSERT FILE PATH"))
+
+# URLs
+iosPQ_URL = 'https://www.ons.gov.uk/generator?format=csv&uri=/economy/economicoutputandproductivity/output/timeseries/s2n5/ios1'
+iosOQ_URL = 'https://www.ons.gov.uk/generator?format=csv&uri=/economy/economicoutputandproductivity/output/timeseries/s2n4/ios1'
+sppiindex_URL = 'https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/i392/sppi'
+
+# List of URLs
+ons_URL_lst = [iosPQ_URL, iosOQ_URL, sppiindex_URL]
+
+##################################################################################################################################
+##################################################################################################################################
+
+with requests.Session() as s:
+    for i in ons_URL_lst:
+        # Access the csv
+        download = s.get(i)
+        decoded_content = download.content.decode('utf-8')
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        element = list(cr)
+
+        # Creating dataframe and manipulating strings
+        ons_df = pd.DataFrame(element)
+        df_title = ons_df.iloc[0].values[1]
+        df_id = ons_df.iloc[1].values[1]
+        df_source = ons_df.iloc[2].values[1]
+        df_releasedate = ons_df.iloc[5].values[1]
+        df_nextrelease = ons_df.iloc[6].values[1]
+
+        # Saving down csv
+        print("Creating", df_id + "_" + df_source + ".csv :", df_title + " file, published on the " + df_releasedate + "."
+              + " The next release is on the", df_nextrelease)
+        file_name = Path(file_path + "/" + df_id + "_" + df_source + ".csv")
+        ons_df.to_csv(file_name, header=False, index=False)
+        time.sleep(2)
